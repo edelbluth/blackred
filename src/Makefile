@@ -18,6 +18,6 @@ sdist:
 	$(PYTHON_SETUP_PY) sdist
 
 bdist:
-	$(PYTHON_SETUP_PY) bdist_wheel
+	$(PYTHON_SETUP_PY) bdist
 
 dist: copy_dep check sdist bdist
