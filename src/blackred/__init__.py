@@ -16,7 +16,7 @@ limitations under the License.
 
 
 __author__ = 'Juergen Edelbluth'
-__version__ = '0.1'
+__version__ = '0.1.0'
 
 
 import redis

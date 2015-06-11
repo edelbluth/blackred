@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 """
 Copyright 2015 Juergen Edelbluth
 

@@ -21,10 +21,17 @@ __author__ = 'Juergen Edelbluth'
 from distutils.core import setup
 
 
+def read_helper(file: str) -> str:
+    with open(file, 'r') as f:
+        return f.read()
+
+
 setup(
     name='BlackRed',
     packages=['blackred'],
-    version='0.1',
+    version='0.1.0',
+    long_description=read_helper('../README.md'),
+    license='Apache Software License 2.0',
     description='Dynamic blacklisting library using redis.',
     author='Juergen Edelbluth',
     author_email='dev@juergen.rocks',
