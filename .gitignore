@@ -3,3 +3,4 @@ pyvenv/
 
 .directory
 
+__pycache__/
