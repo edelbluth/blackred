@@ -1,0 +1,6 @@
+*.py text eol=lf encoding=UTF-8
+
+*.sh text eol=lf encoding=UTF-8
+
+*.bat text eol=crlf
+
