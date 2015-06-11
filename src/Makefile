@@ -4,8 +4,8 @@ all: clean dist
 
 clean:
 	rm -rf dist
-	rm LICENSE.txt
-	rm README.txt
+	rm -f LICENSE.txt
+	rm -f README.txt
 
 copy_dep:
 	cp ../LICENSE.txt .
