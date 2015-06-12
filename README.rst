@@ -32,6 +32,7 @@ Basic Usage
 Installation can be done with ``pip install blackred``. Usage is as easy, here an example for a simple user login:
 
 .. code-block:: python
+
    import blackred
 
    def login(username, password, request_ip):
@@ -81,6 +82,7 @@ If you want to use a unix socket to connect, set the ``redis_use_socket`` constr
 the absolute path to the socket with the ``redis_host`` parameter, example:
 
 .. code-block:: python
+
    import blackred
 
    br = blackred.BlackRed(redis_host='/var/run/redis/redis.sock', redis_use_socket=True)
