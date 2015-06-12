@@ -6,11 +6,11 @@ clean:
 	rm -rf dist
 	rm -rf build
 	rm -f LICENSE.txt
-	rm -f README.txt
+	rm -f README
 
 copy_dep:
 	cp ../LICENSE.txt .
-	cp ../README.txt .
+	cp ../README .
 
 check:
 	$(PYTHON_SETUP_PY) check

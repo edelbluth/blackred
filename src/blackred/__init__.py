@@ -43,7 +43,7 @@ class BlackRed(object):
                  redis_host: str=Settings.REDIS_HOST,
                  redis_port: int=Settings.REDIS_PORT,
                  redis_db: int=Settings.REDIS_DB,
-                 redis_use_socket=Settings.REDIS_USE_SOCKET):
+                 redis_use_socket: bool=Settings.REDIS_USE_SOCKET):
         """
         Create an Instance of
 
@@ -77,7 +77,7 @@ class BlackRed(object):
         """
         Check if an item is _not_ already on the blacklist
 
-        :param item: The item to check
+        :param str item: The item to check
         :return: True, when the item is _not_ on the blacklist
         :rtype: bool
         """
@@ -91,11 +91,11 @@ class BlackRed(object):
             connection.expire(key, BlackRed.Settings.BLACKLIST_TTL_SECONDS)
         return False
 
-    def is_blocked(self, item: str):
+    def is_blocked(self, item: str) -> bool:
         """
         Check if an item is on the blacklist
 
-        :param item: The item to check
+        :param str item: The item to check
         :return: True, when the item is on the blacklist
         :rtype: bool
         """
@@ -106,7 +106,7 @@ class BlackRed(object):
         Log a failed action for an item. If the fail count for this item reaches the threshold, the item is moved to the
         blacklist.
 
-        :param item: The item to log
+        :param str item: The item to log
         """
         assert item is not None
         if not self.is_not_blocked(item):
@@ -129,7 +129,7 @@ class BlackRed(object):
         """
         Unblock an item and/or reset it's fail count
 
-        :param item: The item to unblock
+        :param str item: The item to unblock
         """
         assert item is not None
         watchlist_key = BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item)
