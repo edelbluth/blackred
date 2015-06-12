@@ -1,4 +1,5 @@
 MANIFEST
 dist/
-README.md
+build/
+README.txt
 LICENSE.txt

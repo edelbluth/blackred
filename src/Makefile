@@ -4,12 +4,13 @@ all: clean dist
 
 clean:
 	rm -rf dist
+	rm -rf build
 	rm -f LICENSE.txt
 	rm -f README.txt
 
 copy_dep:
 	cp ../LICENSE.txt .
-	cp ../README.md .
+	cp ../README.txt .
 
 check:
 	$(PYTHON_SETUP_PY) check

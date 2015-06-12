@@ -30,7 +30,7 @@ setup(
     name='BlackRed',
     packages=['blackred'],
     version='0.1.0',
-    long_description=read_helper('../README.md'),
+    long_description=read_helper('README.txt'),
     license='Apache Software License 2.0',
     description='Dynamic blacklisting library using redis.',
     author='Juergen Edelbluth',

@@ -1,20 +1,32 @@
-# BlackRed
+BlackRed
+========
 
-## How does it work?
+BlackRed is a dynamic blacklisting library using redis (http://redis.io/) as storage backend.
 
-## Requirements
+How does it work?
+-----------------
 
-## Basic Usage
+Requirements
+------------
 
-## Redis Connection Parameters
+Basic Usage
+-----------
 
-## Conventions and Namespaces
+Redis Connection Parameters
+---------------------------
 
-## Settings and Defaults
+Conventions and Namespaces
+--------------------------
 
-## Use Case in Django-based Web Project
+Settings and Defaults
+---------------------
 
-## License
+Use Case in Django-based Web Project
+------------------------------------
+
+
+License
+-------
 
 Copyright 2015 Juergen Edelbluth
 
@@ -22,7 +34,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
