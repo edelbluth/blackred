@@ -45,7 +45,7 @@ class BlackRed(object):
                  redis_db: int=Settings.REDIS_DB,
                  redis_use_socket: bool=Settings.REDIS_USE_SOCKET):
         """
-        Create an Instance of
+        Create an Instance of BlackRed with configuration for Redis connection
 
         :param str redis_host: Hostname, IP Address or Socket
         :param int redis_port: Port Number

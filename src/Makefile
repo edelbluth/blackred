@@ -10,7 +10,7 @@ clean:
 
 copy_dep:
 	cp ../LICENSE.txt .
-	cp ../README .
+	cp ../README.rst README
 
 check:
 	$(PYTHON_SETUP_PY) check
