@@ -29,14 +29,14 @@ def read_helper(file: str) -> str:
 setup(
     name='BlackRed',
     packages=['blackred'],
-    version='0.1.4',
+    version='0.1.5',
     # long_description=read_helper('README'),
     license='Apache Software License 2.0',
     description='Dynamic blacklisting library using redis.',
     author='Juergen Edelbluth',
     author_email='dev@juergen.rocks',
     url='https://github.com/edelbluth/blackred',
-    download_url='https://github.com/edelbluth/blackred/tarball/v0.1.4',
+    download_url='https://github.com/edelbluth/blackred/tarball/v0.1.5',
     keywords=['protection', 'redis', 'django', 'ban', 'filter'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -51,5 +51,4 @@ setup(
         'Topic :: System :: Networking',
     ],
     requires=['redis'],
-    install_requires=['redis'],
 )

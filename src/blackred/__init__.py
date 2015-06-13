@@ -16,7 +16,7 @@ limitations under the License.
 
 
 __author__ = 'Juergen Edelbluth'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 import redis
@@ -97,11 +97,11 @@ class BlackRed(object):
         key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         value = connection.get(key)
         if value is None:
-            self.__connection_pool.release(connection)
+            # self.__connection_pool.release(connection)
             return True
         if BlackRed.Settings.BLACKLIST_REFRESH_TTL_ON_HIT:
             connection.expire(key, BlackRed.Settings.BLACKLIST_TTL_SECONDS)
-        self.__connection_pool.release(connection)
+        # self.__connection_pool.release(connection)
         return False
 
     def is_blocked(self, item: str) -> bool:
@@ -129,17 +129,17 @@ class BlackRed(object):
         value = connection.get(key)
         if value is None:
             connection.set(key, 1, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
-            self.__connection_pool.release(connection)
+            # self.__connection_pool.release(connection)
             return
         value = int(value) + 1
         if value < BlackRed.Settings.WATCHLIST_TO_BLACKLIST_THRESHOLD:
             connection.set(key, value, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
-            self.__connection_pool.release(connection)
+            # self.__connection_pool.release(connection)
             return
         blacklist_key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         connection.set(blacklist_key, time.time(), ex=BlackRed.Settings.BLACKLIST_TTL_SECONDS)
         connection.delete(key)
-        self.__connection_pool.release(connection)
+        # self.__connection_pool.release(connection)
 
     def unblock(self, item: str) -> None:
         """
@@ -153,4 +153,4 @@ class BlackRed(object):
         connection = self.__get_connection()
         connection.delete(watchlist_key)
         connection.delete(blacklist_key)
-        self.__connection_pool.release(connection)
+        # self.__connection_pool.release(connection)
