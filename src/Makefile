@@ -7,6 +7,7 @@ clean:
 	rm -rf build
 	rm -f LICENSE.txt
 	rm -f README
+	rm -f MANIFEST
 
 copy_dep:
 	cp ../LICENSE.txt .

@@ -125,3 +125,4 @@ class BlackRedTest(unittest.TestCase):
     def test_assert_unblock(self):
         br = blackred.BlackRed()
         self.assertRaises(AssertionError, br.unblock, None)
+
