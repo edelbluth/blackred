@@ -15,10 +15,14 @@ limitations under the License.
 """
 
 
+from setuptools import setup
+import blackred
+
+
 __author__ = 'Juergen Edelbluth'
+__version__ = blackred.__version__
 
-
-from distutils.core import setup
+REQUIREMENTS = ['redis>=2.10']
 
 
 def read_helper(file: str) -> str:
@@ -29,14 +33,14 @@ def read_helper(file: str) -> str:
 setup(
     name='BlackRed',
     packages=['blackred'],
-    version='0.1.5',
-    # long_description=read_helper('README'),
-    license='Apache Software License 2.0',
+    version=__version__,
+    long_description=read_helper('README'),
+    license=read_helper('LICENSE.txt'),
     description='Dynamic blacklisting library using redis.',
-    author='Juergen Edelbluth',
+    author=__author__,
     author_email='dev@juergen.rocks',
     url='https://github.com/edelbluth/blackred',
-    download_url='https://github.com/edelbluth/blackred/tarball/v0.1.5',
+    download_url='https://github.com/edelbluth/blackred/tarball/v' + __version__,
     keywords=['protection', 'redis', 'django', 'ban', 'filter'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -50,5 +54,6 @@ setup(
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Networking',
     ],
-    requires=['redis'],
+    install_requires=REQUIREMENTS,
+    tests_require=REQUIREMENTS,
 )
