@@ -20,6 +20,7 @@ __version__ = '0.2.0'
 
 
 import redis
+from redis.connection import UnixDomainSocketConnection
 import time
 
 
@@ -40,10 +41,10 @@ class BlackRed(object):
         REDIS_USE_SOCKET = False
 
     def __init__(self,
-                 redis_host: str=Settings.REDIS_HOST,
-                 redis_port: int=Settings.REDIS_PORT,
-                 redis_db: int=Settings.REDIS_DB,
-                 redis_use_socket: bool=Settings.REDIS_USE_SOCKET):
+                 redis_host: str=None,
+                 redis_port: int=None,
+                 redis_db: int=None,
+                 redis_use_socket: bool=None):
         """
         Create an Instance of BlackRed with configuration for Redis connection
 
@@ -52,9 +53,19 @@ class BlackRed(object):
         :param int redis_db: DB Number
         :param bool redis_use_socket: True, when a socket should be used instead the TCP/IP connection
         """
+        if redis_host is None:
+            redis_host = BlackRed.Settings.REDIS_HOST
+        if redis_port is None:
+            redis_port = BlackRed.Settings.REDIS_PORT
+        if redis_db is None:
+            redis_db = BlackRed.Settings.REDIS_DB
+        if redis_use_socket is None:
+            redis_use_socket = BlackRed.Settings.REDIS_USE_SOCKET
+
         if redis_use_socket:
             self.__connection_pool = redis.ConnectionPool(
-                unix_socket_path=redis_host,
+                connection_class=UnixDomainSocketConnection,
+                path=redis_host,
                 db=redis_db,
             )
         else:
@@ -86,9 +97,11 @@ class BlackRed(object):
         key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         value = connection.get(key)
         if value is None:
+            # self.__connection_pool.release(connection)
             return True
         if BlackRed.Settings.BLACKLIST_REFRESH_TTL_ON_HIT:
             connection.expire(key, BlackRed.Settings.BLACKLIST_TTL_SECONDS)
+        # self.__connection_pool.release(connection)
         return False
 
     def is_blocked(self, item: str) -> bool:
@@ -116,14 +129,17 @@ class BlackRed(object):
         value = connection.get(key)
         if value is None:
             connection.set(key, 1, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
+            # self.__connection_pool.release(connection)
             return
         value = int(value) + 1
         if value < BlackRed.Settings.WATCHLIST_TO_BLACKLIST_THRESHOLD:
             connection.set(key, value, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
+            # self.__connection_pool.release(connection)
             return
         blacklist_key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         connection.set(blacklist_key, time.time(), ex=BlackRed.Settings.BLACKLIST_TTL_SECONDS)
         connection.delete(key)
+        # self.__connection_pool.release(connection)
 
     def unblock(self, item: str) -> None:
         """
@@ -137,4 +153,4 @@ class BlackRed(object):
         connection = self.__get_connection()
         connection.delete(watchlist_key)
         connection.delete(blacklist_key)
-
+        # self.__connection_pool.release(connection)
