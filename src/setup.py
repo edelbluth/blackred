@@ -16,11 +16,10 @@ limitations under the License.
 
 
 from setuptools import setup
-import blackred
 
 
 __author__ = 'Juergen Edelbluth'
-__version__ = blackred.__version__
+__version__ = '0.1.7'
 
 REQUIREMENTS = ['redis>=2.10']
 
