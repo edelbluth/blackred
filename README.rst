@@ -136,6 +136,8 @@ Links
 - Build Status: `https://travis-ci.org/edelbluth/blackred <https://travis-ci.org/edelbluth/blackred>`_
 - Project Homepage: `https://github.com/edelbluth/blackred <https://github.com/edelbluth/blackred>`_
 - PyPi Page: `https://pypi.python.org/pypi/blackred <https://pypi.python.org/pypi/blackred>`_
+- German Description: `https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html
+  <https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html>`_
 
 
 License
