@@ -1,6 +1,6 @@
 PYTHON_SETUP_PY = python setup.py
 
-all: clean dist
+all: clean rsttest dist
 
 clean:
 	rm -rf dist
@@ -13,13 +13,16 @@ copy_dep:
 	cp ../LICENSE.txt .
 	cp ../README.rst README
 
-check:
+check: copy_dep
 	$(PYTHON_SETUP_PY) check
 
-sdist:
+sdist: copy_dep
 	$(PYTHON_SETUP_PY) sdist
 
-bdist:
+bdist: copy_dep
 	$(PYTHON_SETUP_PY) bdist
 
-dist: copy_dep check sdist bdist
+rsttest: copy_dep
+	rst2html.py --strict README > /dev/null
+
+dist: check sdist bdist
