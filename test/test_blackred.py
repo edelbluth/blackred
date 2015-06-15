@@ -45,6 +45,7 @@ class BlackRedTest(unittest.TestCase):
                        '127.0.0.9']:
             cls.r.delete('BlackRed:WatchList:' + victim)
             cls.r.delete('BlackRed:BlackList:' + victim)
+        cls.r.delete('BlackRed:AnonymizationListSecret')
 
     def test_misconnect(self):
         br = blackred.BlackRed(redis_port=1)
