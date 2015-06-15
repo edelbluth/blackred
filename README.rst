@@ -22,7 +22,7 @@ blocked items.
 Requirements
 ------------
 
-BlackRed runs only under Python 3.2, 3.3, 3.4, 3.5 and PyPy3. There's no support for Python 2.
+BlackRed runs only under Python 3.3, 3.4, 3.5 and PyPy3. There's no support for Python 2.
 
 The only thing BlackRed needs is the `redis package <https://pypi.python.org/pypi/redis>`__ >= 2.10.
 
