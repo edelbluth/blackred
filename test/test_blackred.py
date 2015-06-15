@@ -40,7 +40,9 @@ class BlackRedTest(unittest.TestCase):
         """
         Clean up the redis database
         """
-        for victim in ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4', '127.0.0.5', '127.0.0.6', '127.0.0.7']:
+        for victim in ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4',
+                       '127.0.0.5', '127.0.0.6', '127.0.0.7', '127.0.0.8',
+                       '127.0.0.9']:
             cls.r.delete('BlackRed:WatchList:' + victim)
             cls.r.delete('BlackRed:BlackList:' + victim)
 
@@ -140,3 +142,32 @@ class BlackRedTest(unittest.TestCase):
         value = br.get_blacklist_ttl(item)
         self.assertLessEqual(value, 86400)
         self.assertGreater(value, 86398)
+
+    def test_item_representation(self):
+        item = '127.0.0.8'
+        br = blackred.BlackRed()
+        item_encoded = br.__encode_item(item)
+        self.assertIsNotNone(item_encoded)
+        self.assertEqual(item, item_encoded)
+        blackred.BlackRed.Settings.ANONYMIZATION = True
+        item_encoded = br.__encode_item(item)
+        self.assertIsNotNone(item_encoded)
+        self.assertNotEqual(item, item_encoded)
+        blackred.BlackRed.Settings.ANONYMIZATION = False
+
+    def test_anonymization(self):
+        item = '127.0.0.9'
+        br = blackred.BlackRed()
+        br.log_fail(item)
+        value = self.r.get(blackred.BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
+        self.assertIsNotNone(value)
+        value = int(value)
+        self.assertEqual(value, 1)
+        blackred.BlackRed.Settings.ANONYMIZATION = True
+        br.log_fail(item)
+        # basically, check if it did not hit the same key
+        value = self.r.get(blackred.BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
+        self.assertIsNotNone(value)
+        value = int(value)
+        self.assertEqual(value, 1)
+        blackred.BlackRed.Settings.ANONYMIZATION = False
