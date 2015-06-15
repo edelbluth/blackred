@@ -40,7 +40,7 @@ class BlackRedTest(unittest.TestCase):
         """
         Clean up the redis database
         """
-        for victim in ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4', '127.0.0.5', '127.0.0.6']:
+        for victim in ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4', '127.0.0.5', '127.0.0.6', '127.0.0.7']:
             cls.r.delete('BlackRed:WatchList:' + victim)
             cls.r.delete('BlackRed:BlackList:' + victim)
 
@@ -126,3 +126,17 @@ class BlackRedTest(unittest.TestCase):
         br = blackred.BlackRed()
         self.assertRaises(AssertionError, br.unblock, None)
 
+    def test_ttl_check(self):
+        item = '127.0.0.7'
+        br = blackred.BlackRed()
+        br.log_fail(item)
+        value = br.get_watchlist_ttl(item)
+        self.assertLessEqual(value, 180)
+        self.assertGreater(value, 178)
+        br.log_fail(item)
+        br.log_fail(item)
+        value = br.get_watchlist_ttl(item)
+        self.assertIsNone(value)
+        value = br.get_blacklist_ttl(item)
+        self.assertLessEqual(value, 86400)
+        self.assertGreater(value, 86398)

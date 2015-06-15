@@ -26,14 +26,10 @@ from time import sleep
 class RedisLibraryTest(unittest.TestCase):
 
     redis = None
+    """:type: Redis"""
 
     @classmethod
-    def setUpClass(cls):
-        cls.redis = Redis(host='localhost', port=6379, db=0)
-        """:type: Redis"""
-
-    @classmethod
-    def tearDownClass(cls):
+    def reset(cls):
         cls.redis.delete('test_set_str')
         cls.redis.delete('test_set_int')
         cls.redis.delete('this_should_not_exist')
@@ -43,6 +39,16 @@ class RedisLibraryTest(unittest.TestCase):
         cls.redis.delete('test_delete')
         cls.redis.delete('test_this_one_is_not_there')
         cls.redis.delete('test_ttl')
+        cls.redis.delete('test_some_invalid_key_ttl')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.redis = Redis(host='localhost', port=6379, db=0)
+        cls.reset()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.reset()
 
     def test_set_str(self):
         self.redis.set('test_set_str', 'test_set_value')
@@ -119,3 +125,7 @@ class RedisLibraryTest(unittest.TestCase):
 
     def test_delete_nonexistent(self):
         self.redis.delete('test_this_one_is_not_there')
+
+    def test_ttl_for_invalid(self):
+        value = self.redis.ttl('test_some_invalid_key_ttl')
+        self.assertIsNone(value)
