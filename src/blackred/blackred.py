@@ -35,6 +35,8 @@ class BlackRed(object):
         WATCHLIST_TO_BLACKLIST_THRESHOLD = 3
         BLACKLIST_REFRESH_TTL_ON_HIT = True
 
+        ANONYMIZATION = False
+
         REDIS_HOST = 'localhost'
         REDIS_PORT = 6379
         REDIS_DB = 0

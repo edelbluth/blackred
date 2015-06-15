@@ -121,6 +121,9 @@ Global settings
   blacklist entry is reset to ``blackred.BlackRed.Settings.BLACKLIST_TTL_SECONDS``. So if this is set to ``True``
   (that's the default value) and a blocked user tries to login after 12 hours after blacklisting, his blacklist time is
   increased to another 24 hours.
+- ``blackred.BlackRed.Settings.ANONYMIZATION``: If required, you can turn this on (set it to ``True``) when BlackRed
+  should not store IP addresses, usernames etc. as plain text. A hash value is used instead. This setting might be
+  necessary to get data protection policy compliant.
 
 
 Defaults for new instances
