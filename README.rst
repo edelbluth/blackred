@@ -124,7 +124,8 @@ Global settings
 - ``blackred.BlackRed.Settings.ANONYMIZATION``: If required, you can turn this on (set it to ``True``) when BlackRed
   should not store IP addresses, usernames etc. as plain text. A hash value is used instead. This setting might be
   necessary to get data protection policy compliant.
-
+- ``BlackRed.Settings.SALT_KEY``: The key for saving the individual salt for anonymization. Defaults to
+  ``BlackRed:AnonymizationListSecret`` and should only be changed when it collides with one of your namespaces.
 
 Defaults for new instances
 ..........................

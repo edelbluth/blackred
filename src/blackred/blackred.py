@@ -22,6 +22,19 @@ __version__ = '0.2.0'
 import redis
 from redis.connection import UnixDomainSocketConnection
 import time
+from hashlib import sha512
+from random import SystemRandom
+
+
+def create_salt(length: int=128) -> bytes:
+    """
+    Create a new salt
+
+    :param int length: How many bytes should the salt be long?
+    :return: The salt
+    :rtype: bytes
+    """
+    return b''.join(bytes([SystemRandom().randint(0, 255)]) for _ in range(length))
 
 
 class BlackRed(object):
@@ -30,6 +43,7 @@ class BlackRed(object):
 
         WATCHLIST_KEY_TEMPLATE = 'BlackRed:WatchList:{:s}'
         BLACKLIST_KEY_TEMPLATE = 'BlackRed:BlackList:{:s}'
+        SALT_KEY = 'BlackRed:AnonymizationListSecret'
         WATCHLIST_TTL_SECONDS = 180
         BLACKLIST_TTL_SECONDS = 86400
         WATCHLIST_TO_BLACKLIST_THRESHOLD = 3
@@ -88,6 +102,24 @@ class BlackRed(object):
         """
         return redis.Redis(connection_pool=self.__connection_pool, db=self.__selected_db)
 
+    def _encode_item(self, item: str) -> str:
+        """
+        If anonymization is on, an item gets salted and hashed here.
+
+        :param str item:
+        :return: Hashed item, if anonymization is on; the unmodified item otherwise
+        :rtype: str
+        """
+        assert item is not None
+        if not BlackRed.Settings.ANONYMIZATION:
+            return item
+        connection = self.__get_connection()
+        salt = connection.get(BlackRed.Settings.SALT_KEY)
+        if salt is None:
+            salt = create_salt()
+            connection.set(BlackRed.Settings.SALT_KEY, salt)
+        return sha512(salt + item.encode()).hexdigest()
+
     def __get_ttl(self, item: str) -> int:
         """
         Get the amount of time a specific item will remain in the database.
@@ -107,6 +139,8 @@ class BlackRed(object):
         :return: Time in seconds. Returns None for a non-existing element.
         :rtype: int
         """
+        assert item is not None
+        item = self._encode_item(item)
         return self.__get_ttl(BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item))
 
     def get_watchlist_ttl(self, item: str) -> int:
@@ -117,6 +151,8 @@ class BlackRed(object):
         :return: Time in seconds. Returns None for a non-existing element
         :rtype: int
         """
+        assert item is not None
+        item = self._encode_item(item)
         return self.__get_ttl(BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
 
     def is_not_blocked(self, item: str) -> bool:
@@ -128,6 +164,7 @@ class BlackRed(object):
         :rtype: bool
         """
         assert item is not None
+        item = self._encode_item(item)
         connection = self.__get_connection()
         key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         value = connection.get(key)
@@ -157,6 +194,7 @@ class BlackRed(object):
         :param str item: The item to log
         """
         assert item is not None
+        item = self._encode_item(item)
         if not self.is_not_blocked(item):
             return
         connection = self.__get_connection()
@@ -183,6 +221,7 @@ class BlackRed(object):
         :param str item: The item to unblock
         """
         assert item is not None
+        item = self._encode_item(item)
         watchlist_key = BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item)
         blacklist_key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
         connection = self.__get_connection()

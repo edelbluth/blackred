@@ -20,12 +20,14 @@ __author__ = 'Juergen Edelbluth'
 
 import unittest
 import blackred
+import blackred.blackred as blackred_util
 import redis
 
 
 class BlackRedTest(unittest.TestCase):
 
     r = None
+    """:type: redis.Redis"""
 
     @classmethod
     def setUpClass(cls):
@@ -33,19 +35,19 @@ class BlackRedTest(unittest.TestCase):
         Create a redis test connection for validation
         """
         cls.r = redis.Redis(host='localhost', port=6379, db=0)
-        """:type: redis.Redis"""
 
     @classmethod
     def tearDownClass(cls):
         """
         Clean up the redis database
         """
-        for victim in ['127.0.0.1', '127.0.0.2', '127.0.0.3', '127.0.0.4',
-                       '127.0.0.5', '127.0.0.6', '127.0.0.7', '127.0.0.8',
-                       '127.0.0.9']:
-            cls.r.delete('BlackRed:WatchList:' + victim)
-            cls.r.delete('BlackRed:BlackList:' + victim)
-        cls.r.delete('BlackRed:AnonymizationListSecret')
+        cls.r.flushdb()
+
+    def setUp(self):
+        blackred.BlackRed.Settings.ANONYMIZATION = False
+
+    def tearDown(self):
+        blackred.BlackRed.Settings.ANONYMIZATION = False
 
     def test_misconnect(self):
         br = blackred.BlackRed(redis_port=1)
@@ -129,6 +131,18 @@ class BlackRedTest(unittest.TestCase):
         br = blackred.BlackRed()
         self.assertRaises(AssertionError, br.unblock, None)
 
+    def test_assert_encode(self):
+        br = blackred.BlackRed()
+        self.assertRaises(AssertionError, br._encode_item, None)
+
+    def test_assert_watchlist_ttl(self):
+        br = blackred.BlackRed()
+        self.assertRaises(AssertionError, br.get_watchlist_ttl, None)
+
+    def test_assert_blacklist_ttl(self):
+        br = blackred.BlackRed()
+        self.assertRaises(AssertionError, br.get_blacklist_ttl, None)
+
     def test_ttl_check(self):
         item = '127.0.0.7'
         br = blackred.BlackRed()
@@ -147,14 +161,13 @@ class BlackRedTest(unittest.TestCase):
     def test_item_representation(self):
         item = '127.0.0.8'
         br = blackred.BlackRed()
-        item_encoded = br.__encode_item(item)
+        item_encoded = br._encode_item(item)
         self.assertIsNotNone(item_encoded)
         self.assertEqual(item, item_encoded)
         blackred.BlackRed.Settings.ANONYMIZATION = True
-        item_encoded = br.__encode_item(item)
+        item_encoded = br._encode_item(item)
         self.assertIsNotNone(item_encoded)
         self.assertNotEqual(item, item_encoded)
-        blackred.BlackRed.Settings.ANONYMIZATION = False
 
     def test_anonymization(self):
         item = '127.0.0.9'
@@ -171,4 +184,36 @@ class BlackRedTest(unittest.TestCase):
         self.assertIsNotNone(value)
         value = int(value)
         self.assertEqual(value, 1)
-        blackred.BlackRed.Settings.ANONYMIZATION = False
+
+    def test_salt(self):
+        salt = blackred_util.create_salt()
+        self.assertIsNotNone(salt)
+        self.assertIsInstance(salt, bytes)
+        self.assertEqual(len(salt), 128)
+        salt = blackred_util.create_salt(256)
+        self.assertIsNotNone(salt)
+        self.assertIsInstance(salt, bytes)
+        self.assertEqual(len(salt), 256)
+
+    def test_anon_triple_fail(self):
+        blackred.BlackRed.Settings.ANONYMIZATION = True
+        br = blackred.BlackRed()
+        victim = '127.0.0.10'
+        br.log_fail(victim)
+        self.assertFalse(br.is_blocked(victim))
+        value = self.r.get('BlackRed:WatchList:' + victim)
+        self.assertIsNone(value)
+        value = self.r.get('BlackRed:BlackList:' + victim)
+        self.assertIsNone(value)
+        br.log_fail(victim)
+        self.assertFalse(br.is_blocked(victim))
+        value = self.r.get('BlackRed:WatchList:' + victim)
+        self.assertIsNone(value)
+        value = self.r.get('BlackRed:BlackList:' + victim)
+        self.assertIsNone(value)
+        br.log_fail(victim)
+        self.assertFalse(br.is_not_blocked(victim))
+        value = self.r.get('BlackRed:WatchList:' + victim)
+        self.assertIsNone(value)
+        value = self.r.get('BlackRed:BlackList:' + victim)
+        self.assertIsNone(value)
