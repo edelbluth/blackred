@@ -62,6 +62,8 @@ class BlackRed(object):
         if redis_use_socket is None:
             redis_use_socket = BlackRed.Settings.REDIS_USE_SOCKET
 
+        self.__selected_db = redis_db
+
         if redis_use_socket:
             self.__connection_pool = redis.ConnectionPool(
                 connection_class=UnixDomainSocketConnection,
@@ -82,7 +84,38 @@ class BlackRed(object):
         :return: Redis connection instance
         :rtype: redis.Redis
         """
-        return redis.Redis(connection_pool=self.__connection_pool)
+        return redis.Redis(connection_pool=self.__connection_pool, db=self.__selected_db)
+
+    def __get_ttl(self, item: str) -> int:
+        """
+        Get the amount of time a specific item will remain in the database.
+
+        :param str item: The item to get the TTL for
+        :return: Time in seconds. Returns None for a non-existing element.
+        :rtype: int
+        """
+        connection = self.__get_connection()
+        return connection.ttl(item)
+
+    def get_blacklist_ttl(self, item: str) -> int:
+        """
+        Get the amount of time a specific item will remain on the blacklist.
+
+        :param str item: The item to get the TTL for on the blacklist
+        :return: Time in seconds. Returns None for a non-existing element.
+        :rtype: int
+        """
+        return self.__get_ttl(BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item))
+
+    def get_watchlist_ttl(self, item: str) -> int:
+        """
+        Get the amount of time a specific item will remain on the watchlist.
+
+        :param str item: The item to get the TTL for on the watchlist
+        :return: Time in seconds. Returns None for a non-existing element
+        :rtype: int
+        """
+        return self.__get_ttl(BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
 
     def is_not_blocked(self, item: str) -> bool:
         """
