@@ -72,6 +72,13 @@ requires one parameter:
 
 - ``item``: A username, an IP address or whatever you use to identify the try
 
+To find out how long an item on the watchlist or blacklist will stay there before it expires, use the
+``get_watchlist_ttl`` method (for items on the watchlist) and the ``get_blacklist_ttl`` method (for items on the
+blacklist). Both methods return the number of seconds before expiry and None in case of a non-existing item. Both
+methods require one parameter:
+
+- ``item``: A username, an IP address or whatever you want to check
+
 
 Redis Connection Parameters
 ---------------------------
