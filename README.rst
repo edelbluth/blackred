@@ -4,6 +4,11 @@ BlackRed
 BlackRed is a dynamic blacklisting library using `Redis <http://redis.io/>`__ as a fast and reliable
 storage backend.
 
+.. image:: https://coveralls.io/repos/edelbluth/blackred/badge.svg?branch=master
+   :target: https://coveralls.io/r/edelbluth/blackred?branch=master
+.. image:: https://travis-ci.org/edelbluth/blackred.svg?branch=master
+   :target: https://travis-ci.org/edelbluth/blackred
+
 
 How does it work?
 -----------------
