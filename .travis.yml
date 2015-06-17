@@ -10,14 +10,19 @@ services:
   - redis-server
 
 install:
+  - pip install coveralls
   - pip install docutils pygments
   - pip install -r requirements.txt
 
 script:
   - (cd test && python testrunner.py)
   - (cd src && make)
+  - (cd test && coverage run testrunner.py)
 
 notifications:
   email:
     on_success: change
     on_failure: always
+
+after_success:
+  coveralls
