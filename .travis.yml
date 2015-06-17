@@ -17,7 +17,7 @@ install:
 script:
   - (cd test && python testrunner.py)
   - (cd src && make)
-  - (cd test && coverage run --source=../src/,../test/ testrunner.py)
+  - (cd test && coverage run --source=../src/,../test/ --branch --omit="*setup.py*","*testrunner.py*" testrunner.py)
 
 notifications:
   email:
