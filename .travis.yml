@@ -17,7 +17,7 @@ install:
 script:
   - (cd test && python testrunner.py)
   - (cd src && make)
-  - (cd test && coverage run --source=../src/ --branch --omit="*setup.py*" testrunner.py)
+  - (cd test && coverage run --source=blackred --branch testrunner.py)
 
 notifications:
   email:
@@ -25,4 +25,5 @@ notifications:
     on_failure: always
 
 after_success:
-  - coveralls
+  - (cd test && coverage report)
+  - (cd test && coveralls)
