@@ -45,9 +45,11 @@ class BlackRedTest(unittest.TestCase):
 
     def setUp(self):
         blackred.BlackRed.Settings.ANONYMIZATION = False
+        blackred.BlackRed.Settings.REDIS_USE_SOCKET = False
 
     def tearDown(self):
         blackred.BlackRed.Settings.ANONYMIZATION = False
+        blackred.BlackRed.Settings.REDIS_USE_SOCKET = False
 
     def test_misconnect(self):
         br = blackred.BlackRed(redis_port=1)
@@ -68,6 +70,7 @@ class BlackRedTest(unittest.TestCase):
         value = self.r.get('BlackRed:BlackList:' + victim)
         self.assertIsNone(value)
         self.assertTrue(br.is_not_blocked(victim))
+        self.assertFalse(br.is_blocked(victim))
 
     def test_double_fail(self):
         br = blackred.BlackRed()
@@ -80,6 +83,7 @@ class BlackRedTest(unittest.TestCase):
         value = self.r.get('BlackRed:BlackList:' + victim)
         self.assertIsNone(value)
         self.assertTrue(br.is_not_blocked(victim))
+        self.assertFalse(br.is_blocked(victim))
 
     def test_triple_fail(self):
         br = blackred.BlackRed()
@@ -93,9 +97,17 @@ class BlackRedTest(unittest.TestCase):
         self.assertIsNotNone(value)
         self.assertFalse(br.is_not_blocked(victim))
 
-    def test_check_blacklisted(self):
+    def test_check_blacklisted_blocked(self):
         br = blackred.BlackRed()
         victim = '127.0.0.5'
+        br.log_fail(victim)
+        br.log_fail(victim)
+        br.log_fail(victim)
+        self.assertTrue(br.is_blocked(victim))
+
+    def test_check_blacklisted_notblocked(self):
+        br = blackred.BlackRed()
+        victim = '127.0.0.12'
         br.log_fail(victim)
         br.log_fail(victim)
         br.log_fail(victim)
@@ -217,3 +229,22 @@ class BlackRedTest(unittest.TestCase):
         self.assertIsNone(value)
         value = self.r.get('BlackRed:BlackList:' + victim)
         self.assertIsNone(value)
+
+    def test_log_fail_on_blocked(self):
+        br = blackred.BlackRed()
+        victim = '127.0.0.11'
+        br.log_fail(victim)
+        br.log_fail(victim)
+        br.log_fail(victim)
+        self.assertTrue(br.is_blocked(victim))
+        br.log_fail(victim)
+        self.assertTrue(br.is_blocked(victim))
+
+    def test_socket_connection_fail_predef(self):
+        blackred.BlackRed.Settings.REDIS_USE_SOCKET = True
+        br = blackred.BlackRed()
+        self.assertRaises(redis.ConnectionError, br.is_blocked, '127.0.0.13')
+
+    def test_socket_connection_fail_init(self):
+        br = blackred.BlackRed(redis_use_socket=True)
+        self.assertRaises(redis.ConnectionError, br.is_blocked, '127.0.0.14')

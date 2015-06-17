@@ -195,7 +195,7 @@ class BlackRed(object):
         """
         assert item is not None
         item = self._encode_item(item)
-        if not self.is_not_blocked(item):
+        if self.is_blocked(item):
             return
         connection = self.__get_connection()
         key = BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item)
