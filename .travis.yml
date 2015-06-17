@@ -15,7 +15,6 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - (cd test && python testrunner.py)
   - (cd src && make)
   - (cd test && coverage run --source=blackred --branch testrunner.py)
 
