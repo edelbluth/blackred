@@ -8,6 +8,16 @@ storage backend.
    :target: https://coveralls.io/r/edelbluth/blackred?branch=master
 .. image:: https://travis-ci.org/edelbluth/blackred.svg?branch=master
    :target: https://travis-ci.org/edelbluth/blackred
+.. image:: https://img.shields.io/pypi/v/BlackRed.svg
+   :target: https://pypi.python.org/pypi/BlackRed
+.. image:: https://img.shields.io/pypi/status/BlackRed.svg
+   :target: https://pypi.python.org/pypi/BlackRed
+.. image:: https://img.shields.io/pypi/dd/BlackRed.svg
+   :target: https://pypi.python.org/pypi/BlackRed
+.. image:: https://img.shields.io/github/license/edelbluth/blackred.svg
+   :target: https://github.com/edelbluth/blackred
+.. image:: https://img.shields.io/badge/juergen-rocks-000033.svg?style=flat
+   :target: https://juergen.rocks/
 
 
 How does it work?
