@@ -10,15 +10,14 @@ services:
   - redis-server
 
 install:
-  - pip install flake8
+  - pip install -r test-requirements.txt
   - pip install coveralls
-  - pip install docutils pygments
   - pip install -r requirements.txt
 
 script:
-  - (flake8 --max-line-length=120 --max-complexity=8 --show-source --statistics src test)
+  - (flake8 --max-line-length=120 --max-complexity=8 --show-source --statistics src)
+  - (cd src && py.test --genscript=blackred/test/testrunner.py -v && coverage run --source=blackred --omit="blackred/test/*" --branch blackred/test/testrunner.py)
   - (cd src && make)
-  - (cd test && coverage run --source=blackred --branch testrunner.py)
 
 notifications:
   email:
@@ -26,5 +25,5 @@ notifications:
     on_failure: always
 
 after_success:
-  - (cd test && coverage report)
-  - (cd test && coveralls)
+  - (cd src && coverage report)
+  - (cd src && coveralls)

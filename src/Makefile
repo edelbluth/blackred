@@ -8,6 +8,7 @@ clean:
 	rm -f LICENSE.txt
 	rm -f README
 	rm -f MANIFEST
+	rm -rf BlackRed.egg-info
 
 copy_dep:
 	cp ../LICENSE.txt .

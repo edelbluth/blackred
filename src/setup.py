@@ -21,7 +21,17 @@ from setuptools import setup
 __author__ = 'Juergen Edelbluth'
 __version__ = '0.3.0'
 
-REQUIREMENTS = ['redis>=2.10']
+REQUIREMENTS = [
+    'redis>=2.10',
+]
+
+TEST_REQUIREMENTS = REQUIREMENTS + [
+    'flake8==2.4.1',
+    'pytest==2.7.2',
+    'coverage==3.7.1',
+    'docutils==0.12',
+    'Pygments==2.0.2',
+]
 
 
 def read_helper(file: str) -> str:
@@ -34,7 +44,7 @@ setup(
     packages=['blackred'],
     version=__version__,
     long_description=read_helper('README'),
-    license=read_helper('LICENSE.txt'),
+    license='Apache License 2.0',
     description='Dynamic blacklisting library using redis.',
     author=__author__,
     author_email='dev@juergen.rocks',
@@ -54,5 +64,5 @@ setup(
         'Topic :: System :: Networking',
     ],
     install_requires=REQUIREMENTS,
-    tests_require=REQUIREMENTS,
+    tests_require=TEST_REQUIREMENTS,
 )
