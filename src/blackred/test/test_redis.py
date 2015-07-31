@@ -133,4 +133,3 @@ class RedisLibraryTest(unittest.TestCase):
 
     def test_auth_unset(self):
         self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
-
