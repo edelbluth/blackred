@@ -34,7 +34,7 @@ class RedisTestBase(unittest.TestCase):
         cls.redis = Redis(host='localhost', port=6379, db=0)
 
 
-class RedisLibraryTest(RedisTestBase):
+class RedisLibraryNoAuthTest(RedisTestBase):
 
     redis = None
     """:type: Redis"""
@@ -54,13 +54,13 @@ class RedisLibraryTest(RedisTestBase):
 
     @classmethod
     def setUpClass(cls):
-        super(RedisLibraryTest, cls).setUpClass()
+        super(RedisLibraryNoAuthTest, cls).setUpClass()
         cls.reset()
 
     @classmethod
     def tearDownClass(cls):
         cls.reset()
-        super(RedisLibraryTest, cls).tearDownClass()
+        super(RedisLibraryNoAuthTest, cls).tearDownClass()
 
     def test_set_str(self):
         self.redis.set('test_set_str', 'test_set_value')
@@ -146,7 +146,7 @@ class RedisLibraryTest(RedisTestBase):
         self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
 
 
-class RedisLibraryAuthTest(RedisLibraryTest):
+class RedisLibraryAuthTest(RedisLibraryNoAuthTest):
 
     @classmethod
     def setUpClass(cls):
@@ -165,3 +165,23 @@ class RedisLibraryAuthTest(RedisLibraryTest):
 
     def setUp(self):
         self.test_auth()
+
+
+class RedisLibraryAuthFailTest(RedisTestBase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(RedisLibraryAuthFailTest, cls).setUpClass()
+        cls.redis.execute_command('CONFIG SET REQUIREPASS password')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.redis.execute_command('AUTH password')
+        cls.redis.execute_command('CONFIG SET REQUIREPASS ')
+        super(RedisLibraryAuthFailTest, cls).tearDownClass()
+
+    def test_get(self):
+        self.assertRaises(ResponseError, self.redis.get, 'test_dummy')
+
+    def test_set(self):
+        self.assertRaises(ResponseError, self.redis.set, 'test_dummy', 'test_dummy')
