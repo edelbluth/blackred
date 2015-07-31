@@ -19,6 +19,7 @@ __author__ = 'Juergen Edelbluth'
 
 
 from redis import Redis
+from redis.exceptions import ResponseError
 import unittest
 from time import sleep
 
@@ -129,3 +130,7 @@ class RedisLibraryTest(unittest.TestCase):
     def test_ttl_for_invalid(self):
         value = self.redis.ttl('test_some_invalid_key_ttl')
         self.assertIsNone(value)
+
+    def test_auth_unset(self):
+        self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
+
