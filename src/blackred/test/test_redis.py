@@ -24,7 +24,17 @@ import unittest
 from time import sleep
 
 
-class RedisLibraryTest(unittest.TestCase):
+class RedisTestBase(unittest.TestCase):
+
+    redis = None
+    """:type: Redis"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.redis = Redis(host='localhost', port=6379, db=0)
+
+
+class RedisLibraryTest(RedisTestBase):
 
     redis = None
     """:type: Redis"""
@@ -44,12 +54,13 @@ class RedisLibraryTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.redis = Redis(host='localhost', port=6379, db=0)
+        super(RedisLibraryTest, cls).setUpClass()
         cls.reset()
 
     @classmethod
     def tearDownClass(cls):
         cls.reset()
+        super(RedisLibraryTest, cls).tearDownClass()
 
     def test_set_str(self):
         self.redis.set('test_set_str', 'test_set_value')
