@@ -131,5 +131,26 @@ class RedisLibraryTest(unittest.TestCase):
         value = self.redis.ttl('test_some_invalid_key_ttl')
         self.assertIsNone(value)
 
-    def test_auth_unset(self):
+    def test_auth(self):
         self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
+
+
+class RedisLibraryAuthTest(RedisLibraryTest):
+
+    @classmethod
+    def setUpClass(cls):
+        super(RedisLibraryAuthTest, cls).setUpClass()
+        cls.redis.execute_command('CONFIG SET REQUIREPASS password')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.redis.execute_command('AUTH password')
+        cls.redis.execute_command('CONFIG SET REQUIREPASS ')
+        super(RedisLibraryAuthTest, cls).tearDownClass()
+
+    def test_auth(self):
+        r = self.redis.execute_command('AUTH password')
+        self.assertTrue(r)
+
+    def setUp(self):
+        self.test_auth()
