@@ -10,6 +10,9 @@ python:
 services:
   - redis-server
 
+env:
+  - SPHINX_VERSION="sphinx>=1.3"
+
 matrix:
   include:
     - python: "pypy3"
