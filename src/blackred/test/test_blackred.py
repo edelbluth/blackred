@@ -24,7 +24,7 @@ import blackred.blackred as blackred_util
 import redis
 
 
-class BlackRedTest(unittest.TestCase):
+class BlackRedTestWithoutAuthentication(unittest.TestCase):
 
     r = None
     """:type: redis.Redis"""
@@ -177,6 +177,7 @@ class BlackRedTest(unittest.TestCase):
         self.assertIsNotNone(item_encoded)
         self.assertEqual(item, item_encoded)
         blackred.BlackRed.Settings.ANONYMIZATION = True
+        br = blackred.BlackRed()
         item_encoded = br._encode_item(item)
         self.assertIsNotNone(item_encoded)
         self.assertNotEqual(item, item_encoded)
@@ -190,6 +191,7 @@ class BlackRedTest(unittest.TestCase):
         value = int(value)
         self.assertEqual(value, 1)
         blackred.BlackRed.Settings.ANONYMIZATION = True
+        br = blackred.BlackRed()
         br.log_fail(item)
         # basically, check if it did not hit the same key
         value = self.r.get(blackred.BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
@@ -248,3 +250,34 @@ class BlackRedTest(unittest.TestCase):
     def test_socket_connection_fail_init(self):
         br = blackred.BlackRed(redis_use_socket=True)
         self.assertRaises(redis.ConnectionError, br.is_blocked, '127.0.0.14')
+
+
+class BlackRedTestWithAuthentication(BlackRedTestWithoutAuthentication):
+
+    @classmethod
+    def setUpClass(cls):
+        super(BlackRedTestWithAuthentication, cls).setUpClass()
+        cls.r.config_set('REQUIREPASS', 'password')
+        cls.r = redis.Redis(host='localhost', port=6379, db=0)
+        cls.r.execute_command('AUTH password')
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.r.config_set('REQUIREPASS', '')
+        cls.r = redis.Redis(host='localhost', port=6379, db=0)
+        super(BlackRedTestWithAuthentication, cls).tearDownClass()
+
+    def setUp(self):
+        blackred.BlackRed.Settings.ANONYMIZATION = False
+        blackred.BlackRed.Settings.REDIS_USE_SOCKET = False
+        blackred.BlackRed.Settings.REDIS_AUTH = 'password'
+
+    def tearDown(self):
+        blackred.BlackRed.Settings.REDIS_AUTH = None
+        blackred.BlackRed.Settings.ANONYMIZATION = False
+        blackred.BlackRed.Settings.REDIS_USE_SOCKET = False
+
+    def test_invalid_password(self):
+        blackred.BlackRed.Settings.REDIS_AUTH = 'wrong_password!'
+        br = blackred.BlackRed()
+        self.assertRaises(redis.ResponseError, br.log_fail, 'something')
