@@ -20,7 +20,6 @@ __version__ = '0.3.0'
 
 
 import redis
-from redis.connection import UnixDomainSocketConnection
 import time
 from hashlib import sha512
 from random import SystemRandom
