@@ -41,20 +41,122 @@ class BlackRed(object):
     class Settings:
 
         WATCHLIST_KEY_TEMPLATE = 'BlackRed:WatchList:{:s}'
+        """
+        Template for generating watchlist entries.
+
+        Defaults to ``'BlackRed:WatchList:{:s}'`` and should only be changed when this collides with one of your
+        namespaces.
+
+        :type: str
+        """
+
         BLACKLIST_KEY_TEMPLATE = 'BlackRed:BlackList:{:s}'
+        """
+        Template for generating blacklist entries.
+
+        Defaults to ``'BlackRed:BlackList:{:s}'`` and should only be changed when this collides with one of your
+        namespaces.
+
+        :type: str
+        """
+
         SALT_KEY = 'BlackRed:AnonymizationListSecret'
+        """
+        The key for saving the individual salt for anonymization.
+
+        Defaults to ``BlackRed:AnonymizationListSecret`` and should only be changed when it collides with one of your
+        namespaces.
+
+        :type: str
+        """
+
         WATCHLIST_TTL_SECONDS = 180
+        """
+        Time in seconds for an item to stay on the watchlist.
+
+        If after a logged failure a new failure appears within this time frame, the fail count is increased. If not,
+        the entry is deleted automatically. Defaults to 180 (3 minutes).
+
+        :type: int
+        """
+
         BLACKLIST_TTL_SECONDS = 86400
+        """
+        Time in seconds for an item to stay on the blacklist.
+
+        Defaults to 86400 (24 hours). After that time, the entry is deleted automatically.
+
+        :type: int
+        """
+
         WATCHLIST_TO_BLACKLIST_THRESHOLD = 3
+        """
+        Number of fails for an item to get from the watchlist to the blacklist. Defaults to 3.
+
+        :type: int
+        """
+
         BLACKLIST_REFRESH_TTL_ON_HIT = True
+        """
+        If an item is already on the blacklist and is checked with :py:meth:`BlackRed.is_blocked <BlackRed.is_blocked>`
+        or :py:meth:`BlackRed.is_not_blocked <BlackRed.is_not_blocked>` while on the blacklist, the time to live for the
+        blacklist entry is reset to :py:attr:`BlackRed.Settings.BLACKLIST_TTL_SECONDS
+        <BlackRed.Settings.BLACKLIST_TTL_SECONDS>`.
+
+        So if this is set to ``True`` (that's the default value) and a blocked user tries to login after 12 hours after
+        blacklisting, his blacklist time is increased to another 24 hours.
+
+        :type: bool
+        """
 
         ANONYMIZATION = False
+        """
+        If required, you can turn this on (set it to ``True``) when BlackRed should not store IP addresses, usernames
+        etc. as plain text. A hash value is used instead.
+
+        This setting might be necessary to get data protection policy compliant.
+
+        :type: bool
+        """
 
         REDIS_HOST = 'localhost'
+        """
+        Hostname, IP Address or socket, defaults to ``'localhost'``
+
+        :type: str
+        """
+
         REDIS_PORT = 6379
+        """
+        TCP-Port for Redis, defaults to ``6379``
+
+        :type: int
+        """
+
         REDIS_DB = 0
+        """
+        The Redis database number, defaults to ``0``
+
+        :type: int
+        """
+
         REDIS_USE_SOCKET = False
+        """
+        Tell the ``BlackRed`` class to use a unix socket instead of a TCP/IP connection.
+
+        Defaults to ``False``
+
+        :type: bool
+        """
+
         REDIS_AUTH = None
+        """
+        If the redis connection requires authentication, the password can be predefined here.
+
+        If set to ``None`` (which is the default), authentication will not be used.
+
+        :type: str
+        """
 
     def __init__(self,
                  redis_host: str=None,
@@ -128,7 +230,8 @@ class BlackRed(object):
             r.execute_command('AUTH {:s}'.format(BlackRed.Settings.REDIS_AUTH))
         return r
 
-    def __release_connection(self, connection: redis.Redis) -> None:
+    @staticmethod
+    def __release_connection(connection: redis.Redis) -> None:
         """
         Close a Redis connection explicitly
 
@@ -152,7 +255,7 @@ class BlackRed(object):
         if salt is None:
             salt = create_salt()
             connection.set(self.__redis_conf['salt_key'], salt)
-        self.__release_connection(connection)
+        BlackRed.__release_connection(connection)
         return sha512(salt + item.encode()).hexdigest()
 
     def __get_ttl(self, item: str) -> int:
@@ -165,7 +268,7 @@ class BlackRed(object):
         """
         connection = self.__get_connection()
         ttl = connection.ttl(item)
-        self.__release_connection(connection)
+        BlackRed.__release_connection(connection)
         return ttl
 
     def get_blacklist_ttl(self, item: str) -> int:
@@ -206,11 +309,11 @@ class BlackRed(object):
         key = self.__redis_conf['blacklist_template'].format(item)
         value = connection.get(key)
         if value is None:
-            self.__release_connection(connection)
+            BlackRed.__release_connection(connection)
             return True
         if self.__redis_conf['blacklist_refresh_ttl']:
             connection.expire(key, self.__redis_conf['blacklist_ttl'])
-        self.__release_connection(connection)
+        BlackRed.__release_connection(connection)
         return False
 
     def is_blocked(self, item: str) -> bool:
@@ -239,17 +342,17 @@ class BlackRed(object):
         value = connection.get(key)
         if value is None:
             connection.set(key, 1, ex=self.__redis_conf['watchlist_ttl'])
-            self.__release_connection(connection)
+            BlackRed.__release_connection(connection)
             return
         value = int(value) + 1
         if value < self.__redis_conf['watchlist_to_blacklist']:
             connection.set(key, value, ex=self.__redis_conf['watchlist_ttl'])
-            self.__release_connection(connection)
+            BlackRed.__release_connection(connection)
             return
         blacklist_key = self.__redis_conf['blacklist_template'].format(item)
         connection.set(blacklist_key, time.time(), ex=self.__redis_conf['blacklist_ttl'])
         connection.delete(key)
-        self.__release_connection(connection)
+        BlackRed.__release_connection(connection)
 
     def unblock(self, item: str) -> None:
         """
@@ -264,4 +367,4 @@ class BlackRed(object):
         connection = self.__get_connection()
         connection.delete(watchlist_key)
         connection.delete(blacklist_key)
-        self.__release_connection(connection)
+        BlackRed.__release_connection(connection)
