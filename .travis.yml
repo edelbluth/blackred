@@ -12,6 +12,7 @@ services:
 
 install:
   - pip install -r test-requirements.txt
+  - pip install -r doc/requirements.txt
   - pip install coveralls
   - pip install -r requirements.txt
 
