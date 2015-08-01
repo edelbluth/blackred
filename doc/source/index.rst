@@ -8,6 +8,8 @@ storage backend.
    :target: https://coveralls.io/r/edelbluth/blackred?branch=master
 .. image:: https://travis-ci.org/edelbluth/blackred.svg?branch=master
    :target: https://travis-ci.org/edelbluth/blackred
+.. image:: https://readthedocs.org/projects/blackred/badge/?version=latest
+   :target: https://readthedocs.org/projects/blackred/?badge=latest
 .. image:: https://img.shields.io/pypi/v/BlackRed.svg
    :target: https://pypi.python.org/pypi/BlackRed
 .. image:: https://img.shields.io/pypi/status/BlackRed.svg
@@ -91,6 +93,7 @@ Links
 - PyPi Page: `https://pypi.python.org/pypi/blackred <https://pypi.python.org/pypi/blackred>`_
 - German Description (for 0.2 version): `https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html
   <https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html>`_
+- Documentation (this one): `https://blackred.readthedocs.org/index.html <https://blackred.readthedocs.org/index.html>`_
 
 
 Indices and tables

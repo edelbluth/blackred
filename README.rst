@@ -8,6 +8,8 @@ storage backend.
    :target: https://coveralls.io/r/edelbluth/blackred?branch=master
 .. image:: https://travis-ci.org/edelbluth/blackred.svg?branch=master
    :target: https://travis-ci.org/edelbluth/blackred
+.. image:: https://readthedocs.org/projects/blackred/badge/?version=latest
+   :target: https://readthedocs.org/projects/blackred/?badge=latest
 .. image:: https://img.shields.io/pypi/v/BlackRed.svg
    :target: https://pypi.python.org/pypi/BlackRed
 .. image:: https://img.shields.io/pypi/status/BlackRed.svg
@@ -41,6 +43,7 @@ Links
   `@JuergenRocks <https://twitter.com/JuergenRocks>`_
 - Build Status: `https://travis-ci.org/edelbluth/blackred <https://travis-ci.org/edelbluth/blackred>`_
 - Project Homepage: `https://github.com/edelbluth/blackred <https://github.com/edelbluth/blackred>`_
+- Documentation: `https://blackred.readthedocs.org/index.html <https://blackred.readthedocs.org/index.html>`_
 - PyPi Page: `https://pypi.python.org/pypi/blackred <https://pypi.python.org/pypi/blackred>`_
 - German Description: `https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html
   <https://juergen.rocks/art/mit-blackred-benutzer-logins-absichern.html>`_
