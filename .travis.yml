@@ -20,6 +20,7 @@ script:
   - (flake8 --max-line-length=120 --max-complexity=8 --show-source --statistics src)
   - (cd src && py.test --genscript=blackred/test/testrunner.py -v && coverage run --source=blackred --omit="blackred/test/*" --branch blackred/test/testrunner.py --verbose)
   - (cd src && make)
+  - (cd doc && make clean && make html)
 
 notifications:
   email:
