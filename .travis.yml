@@ -22,7 +22,7 @@ matrix:
 
 install:
   - pip install -r test-requirements.txt
-  - pip install $SPHINX_VERSION sphinx
+  - pip install $SPHINX_VERSION
   - pip install coveralls
   - pip install -r requirements.txt
 
