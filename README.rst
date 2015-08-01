@@ -9,7 +9,7 @@ storage backend.
 .. image:: https://travis-ci.org/edelbluth/blackred.svg?branch=master
    :target: https://travis-ci.org/edelbluth/blackred
 .. image:: https://readthedocs.org/projects/blackred/badge/?version=latest
-   :target: https://readthedocs.org/projects/blackred/?badge=latest
+   :target: https://blackred.readthedocs.org/index.html
 .. image:: https://img.shields.io/pypi/v/BlackRed.svg
    :target: https://pypi.python.org/pypi/BlackRed
 .. image:: https://img.shields.io/pypi/status/BlackRed.svg
