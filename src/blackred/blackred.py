@@ -55,12 +55,14 @@ class BlackRed(object):
         REDIS_PORT = 6379
         REDIS_DB = 0
         REDIS_USE_SOCKET = False
+        REDIS_AUTH = None
 
     def __init__(self,
                  redis_host: str=None,
                  redis_port: int=None,
                  redis_db: int=None,
-                 redis_use_socket: bool=None):
+                 redis_use_socket: bool=None,
+                 redis_auth: str=None):
         """
         Create an Instance of BlackRed with configuration for Redis connection
 
@@ -68,6 +70,7 @@ class BlackRed(object):
         :param int redis_port: Port Number
         :param int redis_db: DB Number
         :param bool redis_use_socket: True, when a socket should be used instead the TCP/IP connection
+        :param str redis_auth: If set, the redis AUTH command will be used with the given password
         """
         if redis_host is None:
             redis_host = BlackRed.Settings.REDIS_HOST
@@ -77,30 +80,62 @@ class BlackRed(object):
             redis_db = BlackRed.Settings.REDIS_DB
         if redis_use_socket is None:
             redis_use_socket = BlackRed.Settings.REDIS_USE_SOCKET
+        if redis_auth is None:
+            redis_auth = BlackRed.Settings.REDIS_AUTH
 
         self.__selected_db = redis_db
+        self.__redis_host = redis_host
+        self.__redis_port = redis_port
+        self.__redis_db = redis_db
+        self.__redis_use_socket = redis_use_socket
+        self.__redis_auth = redis_auth
 
-        if redis_use_socket:
-            self.__connection_pool = redis.ConnectionPool(
-                connection_class=UnixDomainSocketConnection,
-                path=redis_host,
-                db=redis_db,
-            )
-        else:
-            self.__connection_pool = redis.ConnectionPool(
-                host=redis_host,
-                port=redis_port,
-                db=redis_db,
-            )
+        self.__redis_conf = {
+            'watchlist_template': BlackRed.Settings.WATCHLIST_KEY_TEMPLATE,
+            'blacklist_template': BlackRed.Settings.BLACKLIST_KEY_TEMPLATE,
+            'salt_key': BlackRed.Settings.SALT_KEY,
+            'watchlist_ttl': BlackRed.Settings.WATCHLIST_TTL_SECONDS,
+            'blacklist_ttl': BlackRed.Settings.BLACKLIST_TTL_SECONDS,
+            'watchlist_to_blacklist': BlackRed.Settings.WATCHLIST_TO_BLACKLIST_THRESHOLD,
+            'blacklist_refresh_ttl': BlackRed.Settings.BLACKLIST_REFRESH_TTL_ON_HIT,
+            'anonymization': BlackRed.Settings.ANONYMIZATION,
+        }
 
     def __get_connection(self) -> redis.Redis:
         """
-        Get a Redis connection from the connection pool
+        Get a Redis connection
 
         :return: Redis connection instance
         :rtype: redis.Redis
         """
-        return redis.Redis(connection_pool=self.__connection_pool, db=self.__selected_db)
+
+        if self.__redis_use_socket:
+            r = redis.from_url(
+                'unix://{:s}?db={:d}'.format(
+                    self.__redis_host,
+                    self.__redis_db
+                )
+            )
+        else:
+            r = redis.from_url(
+                'redis://{:s}:{:d}/{:d}'.format(
+                    self.__redis_host,
+                    self.__redis_port,
+                    self.__redis_db
+                )
+            )
+
+        if BlackRed.Settings.REDIS_AUTH is not None:
+            r.execute_command('AUTH {:s}'.format(BlackRed.Settings.REDIS_AUTH))
+        return r
+
+    def __release_connection(self, connection: redis.Redis) -> None:
+        """
+        Close a Redis connection explicitly
+
+        :param redis.Redis connection: Connection to be closed
+        """
+        del connection
 
     def _encode_item(self, item: str) -> str:
         """
@@ -111,13 +146,14 @@ class BlackRed(object):
         :rtype: str
         """
         assert item is not None
-        if not BlackRed.Settings.ANONYMIZATION:
+        if not self.__redis_conf['anonymization']:
             return item
         connection = self.__get_connection()
-        salt = connection.get(BlackRed.Settings.SALT_KEY)
+        salt = connection.get(self.__redis_conf['salt_key'])
         if salt is None:
             salt = create_salt()
-            connection.set(BlackRed.Settings.SALT_KEY, salt)
+            connection.set(self.__redis_conf['salt_key'], salt)
+        self.__release_connection(connection)
         return sha512(salt + item.encode()).hexdigest()
 
     def __get_ttl(self, item: str) -> int:
@@ -129,7 +165,9 @@ class BlackRed(object):
         :rtype: int
         """
         connection = self.__get_connection()
-        return connection.ttl(item)
+        ttl = connection.ttl(item)
+        self.__release_connection(connection)
+        return ttl
 
     def get_blacklist_ttl(self, item: str) -> int:
         """
@@ -141,7 +179,7 @@ class BlackRed(object):
         """
         assert item is not None
         item = self._encode_item(item)
-        return self.__get_ttl(BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item))
+        return self.__get_ttl(self.__redis_conf['blacklist_template'].format(item))
 
     def get_watchlist_ttl(self, item: str) -> int:
         """
@@ -153,7 +191,7 @@ class BlackRed(object):
         """
         assert item is not None
         item = self._encode_item(item)
-        return self.__get_ttl(BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item))
+        return self.__get_ttl(self.__redis_conf['watchlist_template'].format(item))
 
     def is_not_blocked(self, item: str) -> bool:
         """
@@ -166,14 +204,14 @@ class BlackRed(object):
         assert item is not None
         item = self._encode_item(item)
         connection = self.__get_connection()
-        key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
+        key = self.__redis_conf['blacklist_template'].format(item)
         value = connection.get(key)
         if value is None:
-            # self.__connection_pool.release(connection)
+            self.__release_connection(connection)
             return True
-        if BlackRed.Settings.BLACKLIST_REFRESH_TTL_ON_HIT:
-            connection.expire(key, BlackRed.Settings.BLACKLIST_TTL_SECONDS)
-        # self.__connection_pool.release(connection)
+        if self.__redis_conf['blacklist_refresh_ttl']:
+            connection.expire(key, self.__redis_conf['blacklist_ttl'])
+        self.__release_connection(connection)
         return False
 
     def is_blocked(self, item: str) -> bool:
@@ -198,21 +236,21 @@ class BlackRed(object):
         if self.is_blocked(item):
             return
         connection = self.__get_connection()
-        key = BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item)
+        key = self.__redis_conf['watchlist_template'].format(item)
         value = connection.get(key)
         if value is None:
-            connection.set(key, 1, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
-            # self.__connection_pool.release(connection)
+            connection.set(key, 1, ex=self.__redis_conf['watchlist_ttl'])
+            self.__release_connection(connection)
             return
         value = int(value) + 1
-        if value < BlackRed.Settings.WATCHLIST_TO_BLACKLIST_THRESHOLD:
-            connection.set(key, value, ex=BlackRed.Settings.WATCHLIST_TTL_SECONDS)
-            # self.__connection_pool.release(connection)
+        if value < self.__redis_conf['watchlist_to_blacklist']:
+            connection.set(key, value, ex=self.__redis_conf['watchlist_ttl'])
+            self.__release_connection(connection)
             return
-        blacklist_key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
-        connection.set(blacklist_key, time.time(), ex=BlackRed.Settings.BLACKLIST_TTL_SECONDS)
+        blacklist_key = self.__redis_conf['blacklist_template'].format(item)
+        connection.set(blacklist_key, time.time(), ex=self.__redis_conf['blacklist_ttl'])
         connection.delete(key)
-        # self.__connection_pool.release(connection)
+        self.__release_connection(connection)
 
     def unblock(self, item: str) -> None:
         """
@@ -222,9 +260,9 @@ class BlackRed(object):
         """
         assert item is not None
         item = self._encode_item(item)
-        watchlist_key = BlackRed.Settings.WATCHLIST_KEY_TEMPLATE.format(item)
-        blacklist_key = BlackRed.Settings.BLACKLIST_KEY_TEMPLATE.format(item)
+        watchlist_key = self.__redis_conf['watchlist_template'].format(item)
+        blacklist_key = self.__redis_conf['blacklist_template'].format(item)
         connection = self.__get_connection()
         connection.delete(watchlist_key)
         connection.delete(blacklist_key)
-        # self.__connection_pool.release(connection)
+        self.__release_connection(connection)
