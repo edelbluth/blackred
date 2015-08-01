@@ -39,6 +39,9 @@ def create_salt(length: int=128) -> bytes:
 class BlackRed(object):
 
     class Settings:
+        """
+        All the attributes of this class are used as default settings for new BlackRed instances.
+        """
 
         WATCHLIST_KEY_TEMPLATE = 'BlackRed:WatchList:{:s}'
         """
