@@ -55,7 +55,6 @@ class RedisLibraryNoAuthTest(RedisTestBase):
     @classmethod
     def setUpClass(cls):
         super(RedisLibraryNoAuthTest, cls).setUpClass()
-        cls.reset()
 
     @classmethod
     def tearDownClass(cls):
@@ -151,20 +150,18 @@ class RedisLibraryAuthTest(RedisLibraryNoAuthTest):
     @classmethod
     def setUpClass(cls):
         super(RedisLibraryAuthTest, cls).setUpClass()
-        cls.redis.execute_command('CONFIG SET REQUIREPASS password')
+        cls.redis.config_set('REQUIREPASS', 'password')
+        cls.redis = Redis(host='localhost', port=6379, db=0)
 
     @classmethod
     def tearDownClass(cls):
-        cls.redis.execute_command('AUTH password')
-        cls.redis.execute_command('CONFIG SET REQUIREPASS ')
+        cls.redis.config_set('REQUIREPASS', '')
+        cls.redis = Redis(host='localhost', port=6379, db=0)
         super(RedisLibraryAuthTest, cls).tearDownClass()
 
     def test_auth(self):
-        r = self.redis.execute_command('AUTH password')
-        self.assertTrue(r)
-
-    def setUp(self):
-        self.test_auth()
+        self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
+        self.redis.execute_command('AUTH password')
 
 
 class RedisLibraryAuthFailTest(RedisTestBase):
@@ -172,12 +169,19 @@ class RedisLibraryAuthFailTest(RedisTestBase):
     @classmethod
     def setUpClass(cls):
         super(RedisLibraryAuthFailTest, cls).setUpClass()
-        cls.redis.execute_command('CONFIG SET REQUIREPASS password')
+        cls.redis.config_set('REQUIREPASS', 'password')
+        cls.redis = Redis(host='localhost', port=6379, db=0)
+        try:
+            cls.redis.execute_command('AUTH wrong_password')
+        except ResponseError:
+            pass
 
     @classmethod
     def tearDownClass(cls):
+        cls.redis = Redis(host='localhost', port=6379, db=0)
         cls.redis.execute_command('AUTH password')
-        cls.redis.execute_command('CONFIG SET REQUIREPASS ')
+        cls.redis.config_set('REQUIREPASS', '')
+        cls.redis = Redis(host='localhost', port=6379, db=0)
         super(RedisLibraryAuthFailTest, cls).tearDownClass()
 
     def test_get(self):
