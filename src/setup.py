@@ -15,8 +15,9 @@ limitations under the License.
 """
 
 
-from setuptools import setup
 import re
+
+from setuptools import setup
 
 __author__ = 'Juergen Edelbluth'
 
