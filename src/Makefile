@@ -1,6 +1,6 @@
 PYTHON_SETUP_PY = python setup.py
 
-all: clean rsttest dist
+all: clean test check dist doc
 
 clean:
 	rm -rf dist
@@ -9,6 +9,7 @@ clean:
 	rm -f README
 	rm -f MANIFEST
 	rm -rf BlackRed.egg-info
+	rm -f blackred/test/testrunner.py
 
 copy_dep:
 	cp ../LICENSE.txt .
@@ -23,7 +24,25 @@ sdist: copy_dep
 bdist: copy_dep
 	$(PYTHON_SETUP_PY) bdist
 
+dist: check sdist bdist
+
+isorttest:
+	(isort -rc -c --line-width=120)
+
+flake8test:
+	(cd .. && flake8 --max-line-length=120 --max-complexity=8 --show-source --statistics src)
+
+pytest:
+	(py.test --genscript=blackred/test/testrunner.py -v && coverage run --source=blackred --omit="blackred/test/*" --branch blackred/test/testrunner.py --verbose)
+
 rsttest: copy_dep
 	rst2html.py --strict README > /dev/null
 
-dist: check sdist bdist
+test: isorttest flake8test pytest rsttest
+	
+docclean:
+	(cd ../doc && make clean)
+
+doc: docclean
+	(cd ../doc && make html)
+
