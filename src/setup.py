@@ -21,15 +21,15 @@ __author__ = 'Juergen Edelbluth'
 __version__ = '0.4.0'
 
 REQUIREMENTS = [
-    'redis>=2.10',
+    'redis>=2.10,<2.11',
 ]
 
 TEST_REQUIREMENTS = REQUIREMENTS + [
-    'flake8==2.4.1',
-    'pytest==2.7.2',
-    'coverage==3.7.1',
-    'docutils==0.12',
-    'Pygments==2.0.2',
+    'flake8>=2.4.1,<2.5',
+    'pytest>=2.7.2,<2.8',
+    'coverage>=4.0.3,<4.1',
+    'docutils=0.12',
+    'Pygments>=2.0.2,<2.1',
 ]
 
 
