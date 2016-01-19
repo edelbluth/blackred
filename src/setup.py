@@ -16,26 +16,41 @@ limitations under the License.
 
 
 from setuptools import setup
+import re
 
 __author__ = 'Juergen Edelbluth'
-__version__ = '0.4.0'
 
-REQUIREMENTS = [
-    'redis>=2.10,<2.11',
-]
 
-TEST_REQUIREMENTS = REQUIREMENTS + [
-    'flake8>=2.4.1,<2.5',
-    'pytest>=2.7.2,<2.8',
-    'coverage>=4.0.3,<4.1',
-    'docutils=0.12',
-    'Pygments>=2.0.2,<2.1',
-]
+def read_requirements_from_file(file: str) -> list:
+    requirements = []
+    with open(file, 'r') as f:
+        lines = f.readlines()
+    for l in lines:
+        r = l.strip()
+        if len(r) > 0:
+            requirements.append(r)
+    return requirements
 
 
 def read_helper(file: str) -> str:
     with open(file, 'r') as f:
         return f.read()
+
+
+def read_version_from_file(file: str) -> str:
+    version_pattern = re.compile('^\s*__version__\s*=\s*\'(?P<version>\d(\.\d)+)\'\s*$')
+    with open(file, 'r') as f:
+        for l in f.readlines():
+            matcher = version_pattern.match(l)
+            if matcher:
+                return matcher.group('version')
+    return '0.0.0'
+
+
+__version__ = read_version_from_file('blackred/blackred.py')
+
+REQUIREMENTS = read_requirements_from_file('../requirements.txt')
+TEST_REQUIREMENTS = REQUIREMENTS + read_requirements_from_file('../test-requirements.txt')
 
 
 setup(
