@@ -3,3 +3,5 @@ docutils==0.12
 flake8==2.4.1
 Pygments==2.0.2
 pytest==2.7.2
+isort==4.2.2
+

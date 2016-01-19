@@ -19,10 +19,11 @@ __author__ = 'Juergen Edelbluth'
 __version__ = '0.4.0'
 
 
-import redis
 import time
 from hashlib import sha512
 from random import SystemRandom
+
+import redis
 
 
 def create_salt(length: int=128) -> bytes:

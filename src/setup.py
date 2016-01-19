@@ -17,7 +17,6 @@ limitations under the License.
 
 from setuptools import setup
 
-
 __author__ = 'Juergen Edelbluth'
 __version__ = '0.4.0'
 

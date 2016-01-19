@@ -19,9 +19,11 @@ __author__ = 'Juergen Edelbluth'
 
 
 import unittest
+
+import redis
+
 import blackred
 import blackred.blackred as blackred_util
-import redis
 
 
 class BlackRedTestWithoutAuthentication(unittest.TestCase):
