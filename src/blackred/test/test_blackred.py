@@ -15,15 +15,14 @@ limitations under the License.
 """
 
 
-__author__ = 'Juergen Edelbluth'
-
-
 import unittest
 
 import redis
 
 import blackred
 import blackred.blackred as blackred_util
+
+__author__ = 'Juergen Edelbluth'
 
 
 class BlackRedTestWithoutAuthentication(unittest.TestCase):

@@ -15,14 +15,13 @@ limitations under the License.
 """
 
 
-__author__ = 'Juergen Edelbluth'
-
-
 import unittest
 from time import sleep
 
 from redis import Redis
 from redis.exceptions import ResponseError
+
+__author__ = 'Juergen Edelbluth'
 
 
 class RedisTestBase(unittest.TestCase):

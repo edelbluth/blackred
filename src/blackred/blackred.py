@@ -15,15 +15,14 @@ limitations under the License.
 """
 
 
-__author__ = 'Juergen Edelbluth'
-__version__ = '0.4.0'
-
-
 import time
 from hashlib import sha512
 from random import SystemRandom
 
 import redis
+
+__author__ = 'Juergen Edelbluth'
+__version__ = '0.4.0'
 
 
 def create_salt(length: int=128) -> bytes:
