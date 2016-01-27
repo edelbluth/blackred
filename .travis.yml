@@ -5,25 +5,14 @@ python:
   - "3.4"
   - "3.5"
   - "nightly"
-  - "pypy3"
 
 services:
   - redis-server
 
-env:
-  - SPHINX_VERSION="sphinx>=1.3"
-
-matrix:
-  include:
-    - python: "pypy3"
-      env: SPHINX_VERSION="sphinx<1.3"
-  exclude:
-    - python: "pypy3"
-
 install:
   - pip install -U pip setuptools
   - pip install -r test-requirements.txt
-  - pip install $SPHINX_VERSION
+  - pip install -r doc-requirements.txt
   - pip install coveralls
   - pip install -r requirements.txt
 
