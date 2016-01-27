@@ -2,7 +2,7 @@ PYTHON_SETUP_PY = python setup.py
 
 all: clean test check dist doc
 
-clean:
+clean: docclean
 	rm -rf dist
 	rm -rf build
 	rm -f LICENSE.txt
@@ -39,10 +39,10 @@ rsttest: copy_dep
 	rst2html.py --strict README > /dev/null
 
 test: isorttest flake8test pytest rsttest
-	
+
 docclean:
 	(cd ../doc && make clean)
 
-doc: docclean
+doc:
 	(cd ../doc && make html)
 
