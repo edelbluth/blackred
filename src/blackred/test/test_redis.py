@@ -141,7 +141,7 @@ class RedisLibraryNoAuthTest(RedisTestBase):
 
     def test_ttl_for_invalid(self):
         value = self.redis.ttl('test_some_invalid_key_ttl')
-        self.assertEquals(value, -2)
+        self.assertEqual(value, -2)
 
     def test_auth(self):
         self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
