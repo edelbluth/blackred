@@ -1,6 +1,6 @@
 coverage>=4.5.3,<4.1
 docutils==0.14
-flake8>=2.4.1,<2.5
+flake8>=3.7,<3.8
 Pygments>=2.0.2,<2.1
 pytest>=3.6,<4.6
 pytest-cov>=2.7.1,<2.8
