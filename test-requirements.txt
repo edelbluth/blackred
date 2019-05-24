@@ -1,4 +1,4 @@
-coverage>=4.5.3,<4.1
+coverage>=4.5.3,<4.6
 docutils==0.14
 flake8>=3.7,<3.8
 Pygments>=2.0.2,<2.1
