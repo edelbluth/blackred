@@ -39,7 +39,7 @@ def read_helper(file: str) -> str:
 
 
 def read_version_from_file(file: str) -> str:
-    version_pattern = re.compile('^__version__\s*=\s*\'(?P<version>\d(\.\d)+)\'\s*$')
+    version_pattern = re.compile(r'^__version__\s*=\s*\'(?P<version>\d(\.\d)+)\'\s*$')
     with open(file, 'r') as f:
         for l in f.readlines():
             matcher = version_pattern.match(l)
