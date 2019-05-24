@@ -25,7 +25,7 @@ __author__ = 'Juergen Edelbluth'
 __version__ = '0.4.0'
 
 
-def create_salt(length: int=128) -> bytes:
+def create_salt(length: int = 128) -> bytes:
     """
     Create a new salt
 
@@ -162,11 +162,11 @@ class BlackRed(object):
         """
 
     def __init__(self,
-                 redis_host: str=None,
-                 redis_port: int=None,
-                 redis_db: int=None,
-                 redis_use_socket: bool=None,
-                 redis_auth: str=None):
+                 redis_host: str = None,
+                 redis_port: int = None,
+                 redis_db: int = None,
+                 redis_use_socket: bool = None,
+                 redis_auth: str = None):
         """
         Create an Instance of BlackRed with configuration for Redis connection
 
