@@ -33,7 +33,7 @@ flake8test:
 	(cd .. && flake8 --max-line-length=120 --max-complexity=8 --show-source --statistics src)
 
 pytest:
-	(py.test --genscript=blackred/test/testrunner.py -v && coverage run --source=blackred --omit="blackred/test/*" --branch blackred/test/testrunner.py --verbose)
+	(pytest --cov=blackred -v)
 
 rsttest: copy_dep
 	rst2html.py --strict README > /dev/null
