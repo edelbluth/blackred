@@ -107,6 +107,7 @@ class RedisLibraryNoAuthTest(RedisTestBase):
         sleep(6)
         value = self.redis.ttl('test_ttl')
         self.assertIsNotNone(value)
+        self.assertNotEqual(value, -2)
         self.assertIsInstance(value, int)
         self.assertLess(value, 5)
         self.assertGreater(value, 3)
@@ -114,6 +115,7 @@ class RedisLibraryNoAuthTest(RedisTestBase):
         sleep(1)
         value = self.redis.ttl('test_ttl')
         self.assertIsNotNone(value)
+        self.assertNotEqual(value, -2)
         self.assertIsInstance(value, int)
         self.assertGreater(value, 8)
         self.assertLess(value, 10)
@@ -139,7 +141,7 @@ class RedisLibraryNoAuthTest(RedisTestBase):
 
     def test_ttl_for_invalid(self):
         value = self.redis.ttl('test_some_invalid_key_ttl')
-        self.assertIsNone(value)
+        self.assertEqual(value, -2)
 
     def test_auth(self):
         self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')

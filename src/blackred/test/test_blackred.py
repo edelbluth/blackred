@@ -166,7 +166,7 @@ class BlackRedTestWithoutAuthentication(unittest.TestCase):
         br.log_fail(item)
         br.log_fail(item)
         value = br.get_watchlist_ttl(item)
-        self.assertIsNone(value)
+        self.assertEqual(value, -2)
         value = br.get_blacklist_ttl(item)
         self.assertLessEqual(value, 86400)
         self.assertGreater(value, 86398)
