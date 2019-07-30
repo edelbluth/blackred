@@ -19,7 +19,7 @@ import unittest
 from time import sleep
 
 from redis import Redis
-from redis.exceptions import ResponseError
+from redis.exceptions import AuthenticationError
 
 __author__ = 'Juergen Edelbluth'
 
@@ -144,7 +144,7 @@ class RedisLibraryNoAuthTest(RedisTestBase):
         self.assertEqual(value, -2)
 
     def test_auth(self):
-        self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
+        self.assertRaises(AuthenticationError, self.redis.execute_command, 'AUTH x')
 
 
 class RedisLibraryAuthTest(RedisLibraryNoAuthTest):
@@ -162,7 +162,7 @@ class RedisLibraryAuthTest(RedisLibraryNoAuthTest):
         super(RedisLibraryAuthTest, cls).tearDownClass()
 
     def test_auth(self):
-        self.assertRaises(ResponseError, self.redis.execute_command, 'AUTH x')
+        self.assertRaises(AuthenticationError, self.redis.execute_command, 'AUTH x')
         self.redis.execute_command('AUTH password')
 
 
@@ -175,7 +175,7 @@ class RedisLibraryAuthFailTest(RedisTestBase):
         cls.redis = Redis(host='localhost', port=6379, db=0)
         try:
             cls.redis.execute_command('AUTH wrong_password')
-        except ResponseError:
+        except AuthenticationError:
             pass
 
     @classmethod
@@ -187,7 +187,7 @@ class RedisLibraryAuthFailTest(RedisTestBase):
         super(RedisLibraryAuthFailTest, cls).tearDownClass()
 
     def test_get(self):
-        self.assertRaises(ResponseError, self.redis.get, 'test_dummy')
+        self.assertRaises(AuthenticationError, self.redis.get, 'test_dummy')
 
     def test_set(self):
-        self.assertRaises(ResponseError, self.redis.set, 'test_dummy', 'test_dummy')
+        self.assertRaises(AuthenticationError, self.redis.set, 'test_dummy', 'test_dummy')
