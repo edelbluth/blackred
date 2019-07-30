@@ -281,4 +281,4 @@ class BlackRedTestWithAuthentication(BlackRedTestWithoutAuthentication):
     def test_invalid_password(self):
         blackred.BlackRed.Settings.REDIS_AUTH = 'wrong_password!'
         br = blackred.BlackRed()
-        self.assertRaises(redis.ResponseError, br.log_fail, 'something')
+        self.assertRaises(redis.exceptions.AuthenticationError, br.log_fail, 'something')
