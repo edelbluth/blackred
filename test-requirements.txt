@@ -1,4 +1,4 @@
-coverage>=4.5.3,<5.1
+coverage>=4.5.3,<5.2
 docutils>=0.15,<0.17
 flake8>=3.7,<3.8
 pytest>=3.6,<5.5
