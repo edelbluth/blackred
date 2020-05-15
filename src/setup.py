@@ -24,25 +24,25 @@ __author__ = 'Juergen Edelbluth'
 
 def read_requirements_from_file(file: str) -> list:
     requirements = []
-    with open(file, 'r') as f:
-        lines = f.readlines()
-    for l in lines:
-        r = l.strip()
-        if len(r) > 0:
-            requirements.append(r)
+    with open(file, 'r') as file_handle:
+        lines = file_handle.readlines()
+    for line in lines:
+        requirement = line.strip()
+        if len(requirement) > 0:
+            requirements.append(requirement)
     return requirements
 
 
 def read_helper(file: str) -> str:
-    with open(file, 'r') as f:
-        return f.read()
+    with open(file, 'r') as file_handle:
+        return file_handle.read()
 
 
 def read_version_from_file(file: str) -> str:
     version_pattern = re.compile(r'^__version__\s*=\s*\'(?P<version>\d(\.\d)+)\'\s*$')
-    with open(file, 'r') as f:
-        for l in f.readlines():
-            matcher = version_pattern.match(l)
+    with open(file, 'r') as file_handle:
+        for line in file_handle.readlines():
+            matcher = version_pattern.match(line)
             if matcher:
                 return matcher.group('version')
     return '0.0.0'
