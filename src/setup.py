@@ -29,7 +29,7 @@ def read_requirements_from_file(file: str) -> list:
     for line in lines:
         requirement = line.strip()
         if len(requirement) > 0:
-            requirements.append(r)
+            requirements.append(requirement)
     return requirements
 
 
